@@ -1,0 +1,882 @@
+---
+title: "R Introduction"
+author: "Kaiyuan GONG"
+date: "2023-03-05"
+output:
+  html_document:
+    toc: true
+    theme: cerulean
+---
+
+# [**Introduction à R**](https://lrouviere.github.io/TUTO_R/dplyr.html)
+
+# Chapitre 1 Introduction
+
+## Exercice 1.1 (Installation et chargement)
+
+```{r}
+library(tidyverse)
+iris %>% summarize(mean_Petal=mean(Petal.Length))
+```
+
+Calculate the average Petal length of iris
+
+## Ex 1.2 **Premier document**
+
+```{r}
+x <- seq(-2*pi,2*pi,by=0.01)
+y <- sin(x)
+plot(x,y,type="l")
+```
+
+## Exercice 1.4 (Premier document)
+
+## Cosinus
+
+```{r}
+x <- seq(-2*pi,2*pi,by=0.01)
+y <- cos(x)
+plot(x,y,type="l")
+```
+
+## Sinus
+
+```{r}
+x <- seq(-2*pi,2*pi,by=0.01)
+y <- sin(x)
+plot(x,y,type="l")
+```
+
+# Chapitre 2 Les objets R
+
+## **Exercice 2.1 (Manipulation de vecteurs)**
+
+```{r}
+# 1.Calculer la moyenne, la somme, la médiane et la variance du vecteur(1,3,8,9,11)
+  x <- c(1, 3, 8, 9, 11)
+  mean_x <- mean(x) # la moyenne
+  cat("La moyenne est:", mean_x, "\n")
+  
+  sum_x <- sum(x) # la somme
+  cat("La somme est:", sum_x, "\n")
+  
+  median_x <- median(x) # la mediane
+  cat("La médiane est:", median_x, "\n")
+  
+  var_x <- var(x) # la variance
+  cat("La variance est:", var_x, "\n")
+  
+# 2. Créer les vecteurs suivants en utilisant la fonction rep.
+  cat("\n")
+  vec_1 <- rep(1:5, time = 3)
+  vec_2 <- rep(1:5, each = 3)
+  vec_3 <- rep(1:5, c(2, 3,  4, 4, 4))
+  vec_1
+  vec_2
+  vec_3
+
+# 3. réer le vecteur suivant à l’aide de la fonction paste.
+  cat("\n")
+  paste("A", 0:10, ")")
+  
+# 4. letters est un vecteur qui contient les 26 lettres de l’alphabet.
+  cat("\n")
+  which(letters == "q")
+  
+  vec <- paste(letters, 1:26)
+  vec
+
+```
+
+## 
+
+**Exercice 2.2 (Manipulation de matrices)**
+
+```{r}
+# 1. Créer la matrice suivante
+mat <- matrix(c(1, 5, 5, 0, 0, 5, 6, 1, 3, 0, 3, 3, 4, 4, 4, 2), nrow = 4, byrow = TRUE)
+rownames(mat) <- c("row-1", "row-2", "row-3", "row-4")
+colnames(mat) <- c("column 1", "column 2", "column 3", "column 4")
+mat
+
+# 2. Créer un vecteur qui contient la diagonal de mat.
+vec_diag <- diag(mat)
+vec_diag
+
+# 3. Créer une matrice qui contient les 2 premières lignes de mat.
+mat_sub <- mat[1:2, ]
+mat_sub
+
+# 4. Créer une matrice qui contient les 2 dernières colonnes de mat.
+mat_sub_ <- mat[ , 3:4]
+mat_sub_
+
+# 5. Calculer le déterminant et l’inverse de mat.
+det_mat <- det(mat)
+inv_mat <- solve(mat)
+det_mat
+inv_mat
+```
+
+## 
+
+**Exercice 2.3 (Manipulations simples sur un jeu de données**
+
+```{r}
+# import iris data
+data(iris)
+head(iris)
+
+# 1. Calculer les moyennes et variances des variables Sepal.Width et Petal.Length
+mean_sepal.width <- mean(iris$Sepal.Width)
+var_sepal.width <- var(iris$Sepal.Width)
+
+mean_petal.length <- mean(iris$Sepal.Length)
+var_petal.length <- var(iris$Sepal.Length)
+
+mean_sepal.width
+var_sepal.width
+mean_petal.length
+var_petal.length
+
+# 2. Créer un sous jeu de données qui contient uniquement les iris de l’espèce versicolor. On appellera ce tableau iris2.
+iris2 <- iris[iris$Species == "versicolor", ]
+
+# 3. Ordonner les individus dans iris2 par valeurs décroissantes de la variable Sepal.Length (on pourra utiliser la fonction order).
+
+iris2 <- iris2[order(-iris2$Sepal.Length),]
+head(iris2)
+
+# 4. Calculer les valeurs moyennes de Sepal.Length pour chaque espèce.
+L <- factor(iris$Species)
+levels(L) # check how many types of irirs
+
+# La fonction aggregate() divise le data frame iris en sous-groupes en fonction de la variable Species,
+means_espece <- aggregate(Sepal.Length ~ Species, data = iris, mean)
+means_espece
+
+# 5. Ajouter une variable (qu’on appellera sum.Petal) dans le dataframe iris qui contiendra la somme de Petal.Length et Petal.Width
+sum.Petal <- iris$Petal.Length + iris$Petal.Width
+iris$sum.Petal <-  sum.Petal
+head(iris)
+```
+
+## 
+
+**Exercice 2.4 (Fonction apply)**
+
+```{r}
+
+library(lattice)
+data("ethanol")
+
+# 1. Calculer les indicateurs numériques standards (moyenne, min, max, etc.) des 3 variables du jeux de données ethanol (disponible dans le package lattice)
+summary(ethanol)
+
+# 2. Calculer les quartiles de chaque variables. On pourra faire un apply avec la fonction quantile.
+apply(ethanol, 2, quantile)
+
+# 3. Faire de même pour les déciles.
+apply(ethanol, 2, quantile, probs = seq(0.1, 0.9, 0.1))
+```
+
+## **Exercice 2.5 (Données manquantes)**
+
+```{r}
+data("presidents")
+df <- matrix(presidents,ncol=4,byrow=T)
+head(df)
+
+# 1. Est-ce que la ligne 20 contient au moins une données manquante ? On pourra utiliser la fonction any.
+any(is.na(df[20,]))
+
+# 2. Quelles sont les lignes de df qui contiennent au moins une donnée manquante ? On pourra utiliser la fonction which.
+S <- which(apply(is.na(df), 1, any)) # fonction any again
+
+# 3. Supprimer les lignes de df qui contiennent au moins une donnée manquante.
+df <- df[-S, ]
+head(df)
+  # another way 
+  # df <- na.omit(df) 
+
+```
+
+# Chapitre 3 Manipuler les données avec dplyr
+
+## **Exercice 3.1 (Premières importations)**
+
+```{r}
+# install.packages("dplyr")
+library('dplyr')
+# 1.Importer les données qui se trouvent dans le fichier mydata.csv. On utilisera la fonction read.csv avec les options par défaut.
+getwd()
+path <- file.path("D:/R_test/Cours", "mydata.csv")
+mydata <- read.csv(path)
+
+# 2. Importer correctement les données qui se trouvent dans le fichier mydata.csv (utiliser sep, dec et row.names).
+mydata <- read.csv("mydata.csv", sep = ",", dec = ".", row.names = 1)
+mydata
+# 3. Importer les données qui se trouvent dans le fichier mydata2.csv.
+mydata2 <- read.csv("D:/R_test/Cours/mydata2.csv")
+#mydata2
+
+# 4. Ce fichier contient des données manquantes (identifiées par un point). A l’aide de na.strings, refaire l’importation en identifiant les données manquantes.
+mydata2 <- read.csv("D:/R_test/Cours/mydata2.csv", na.strings = T, sep = "", row.names = 1)
+# mydata2
+
+# 5. Changer les levels de la variable sex en woman et man (on pourra utiliser la fonction levels).
+# facon 1
+factor_1 <- factor(mydata2$sex)
+levels(factor_1) <- c("woman", "man")
+levels(factor_1)
+mydata2
+# facon 2
+mydata2$sex <- recode_factor(mydata2$sex, "M" = "man", "F" = "woman")
+ mydata2
+
+
+```
+
+## 
+
+**Exercice 3.2 (Jointure de tables)**
+
+```{r}
+# contexte
+df1 <- tibble(name=c("Mary","Peter","John","July"),age=c(18,25,21,43))
+df2 <- tibble(name=c("Zac","Julian"),age=c(23,48))
+df3 <- tibble(size=c(154,178,182,134,142),name1=c("Peter","Mary","July","John","stef"))
+df1
+df2
+df3
+```
+
+```{r}
+# 1. Assembler df1 avec df2 en utilisant bind_rows et calculer la moyenne de la variable age. On appellera df cette nouvelle table.
+library(dplyr)
+# Assembler df1 et df2
+df <- bind_rows(df1, df2)
+mean_age <- mean(df$age)
+print(mean_age)
+
+# 2. Assembler df avec df3 en utilisant full_join.
+df_join <- full_join(df, df3, by = c("name" = "name1"))
+df_join
+
+# 3. Faire la même chose avec inner_join
+df_inner <- inner_join(df, df3, by = c("name" = "name1"))
+df_inner
+
+# 4. Les différences entre full_join et inner_join.
+  # inner_join garde seulement les observations qui ont une correspondance dans les deux dataframes
+  # full_join garde toutes les observations et les combine avec les observations correspondantes dans l'autre dataframe.
+
+```
+
+## 
+
+**Exercice 3.3 (Dplyr sur les iris de Fisher)**
+
+```{r}
+# contextes
+iris <- iris %>% as_tibble()
+# 1. Sélectionner les variables Petal.Width et Species.
+iris_petalwidth_species <- iris %>% select(Petal.Width, Species)
+  #(iris_petalwidth_species)
+
+# 2. Construire une table qui contient uniquement les iris d’espèce versicolor ou  (on pourra utiliser le symbole | pour la condition ou).
+iris_filtered <- iris %>% filter(Species == "versicolor" | Species == "virginica")
+  #head(iris_filtered)
+
+# 3. Calculer le nombre d’iris de l’espèce setosa en utilisant summarise.
+setosa_nb <- iris %>% filter(Species == "setosa") %>% summarise(nombre_setosa=n())
+  # setosa_nb
+
+# 4. Calculer la moyenne de la variable Petal.Width pour les iris de l’espèce versicolor.
+versicolor_mean <- iris %>% 
+  filter(Species == "versicolor") %>% summarise(petal_width = mean(Petal.Width))
+  # versicolor_mean
+
+# 5. Ajouter dans le jeu de données la variable Sum_Petal qui correspond à la somme de Petal.Width et Sepal.Width.
+Sum_Petal <- iris %>%
+  mutate(Sum_Petal = Petal.Width + Sepal.Width)
+  # Sum_Petal
+
+# 6. Calculer la moyenne et la variance de la variable Pepal.Length pour chaque espèce (on pourra utiliser group_by).
+mean_var_iris <- iris %>% 
+  group_by(Species) %>%
+  summarise(mean_iris = mean(Petal.Length), var_iris = var(Petal.Length))
+  # mean_var_iris
+```
+
+## 
+
+**Exercice 3.4 (Trafic aérien aux USA)**
+
+```{r}
+# contextes
+# install.packages('hflights')
+library(hflights)
+hflights <- as_tibble(hflights)
+  # head(hflights)
+
+lut1 <- 
+  c("AA" = "American", "AS" = "Alaska", "B6" = "JetBlue", "CO" ="Continental","DL" = "Delta", "OO" = "SkyWest", "UA" = "United", "US" = "US_Airways", "WN" = "Southwest", "EV" = "Atlantic_Southeast", "F9" = "Frontier", "FL" = "AirTran", "MQ" = "American_Eagle", "XE" = "ExpressJet", "YV" = "Mesa")
+
+lut2 <- c("AA" = "American", "AS" = "Alaska", "B6" = "JetBlue", "CO" = "Continental","DL" = "Delta", "OO" = "SkyWest", "UA" = "United", "US" = "US_Airways", "WN" = "Southwest", "EV" = "Atlantic_Southeast", "F9" = "Frontier", "FL" = "AirTran", "MQ" = "American_Eagle", "XE" = "ExpressJet", "YV" = "Mesa")
+
+hflights1 <- hflights
+hflights1$UniqueCarrier <- lut1[hflights1$UniqueCarrier]
+hflights1$CancellationCode[hflights1$CancellationCode==""] <- "Z"
+hflights1$CancellationCode <- lut2[hflights1$CancellationCode]
+```
+
+```{r}
+# A partir de maintenant, on travaille avec hflights1.
+library(dplyr)
+# hflights1
+# 1. Sélectionner les variables qui se situent entre Origin et Cancelled de différentes façons.
+  # facon 1 ---- select()
+hflights1_selected_1 <- hflights1 %>% select(Origin:Cancelled)
+  # hflights1_selected_1
+  # facon 2 ---- slice()
+hflights1_selected_2 <- hflights1 %>% select(14:19)
+  # hflights1_selected_2
+
+# 2. Sélectionner les variables DepTime, ArrTime, ActualElapsedTime, AirTime, ArrDelay et DepDelay. On pourra remarquer que toutes ces variables contiennent les chaînes de caractère Time ou Delay et utiliser la helper function contains().
+vars_selected <- hflights1 %>% 
+  select(contains("Time"), contains("Delay"))
+  # vars_selected
+
+# 3. Ajouter une variable ActualGroundTime qui correspond à ActualElapsedTime moins AirTime.
+var_add_agt <- hflights1 %>% mutate(ActualGroundTime = ActualElapsedTime - AirTime)
+
+# 4. Ajouter la variable AverageSpeed (=Distance/AirTime) et ordonner la table selon les valeurs décroissantes de cette variable.
+var_add_AveS <- hflights1 %>% 
+  mutate(AverageSpeed = Distance / AirTime) %>% 
+  arrange(desc(AverageSpeed))
+
+# 5. Sélectionner les vols à destination de JFK
+hflights_to_JFK <- hflights1 %>% filter(Dest == "JFK")
+
+# 6. Calculer le nombre de vols à destination de JFK.
+nb_hf_to_JFK <- hflights1 %>% 
+  filter(Dest == "JFK") %>%
+  nrow()
+  # nb_hf_to_JFK
+
+# 7. Créer un résumé de hflights1
+summary_hflights <- hflights1 %>% 
+  summarize(n_flights = n(),
+            n_dest = n_distinct(Dest),
+            n_carrier = n_distinct(UniqueCarrier))
+  # summary_hflights
+
+# 8. Créer un résumé de hflights1 qui contient, pour les vols de la compagnie American,
+summary_hflights_american <- hflights1 %>%
+  filter(UniqueCarrier == "AA") %>%
+  summarize(n_flights = n(),
+            n_cancelled = sum(Cancelled),
+            mean_arr_delay = mean(ArrDelay, na.rm = TRUE))
+
+# 9. Calculer pour chaque compagnie
+summary_hflights_company <- hflights1 %>%
+  group_by(UniqueCarrier) %>%
+  summarize(n_flights = n(),
+            mean_airtime = mean(AirTime, na.rm = TRUE))
+
+# 10. Ordonner les compagnies en fonction des retards moyens au départ.
+summary_ordered_hflights <- hflights1 %>%
+  group_by(UniqueCarrier) %>%
+  summarize(mean_dep_delay = mean(DepDelay, na.rm = TRUE)) %>%
+  arrange(mean_dep_delay)
+```
+
+## 
+
+**Exercice 3.5 (Tournois du grand chelem au tennis)**
+
+```{r}
+# contexte
+  #  tournoi masculin de Roland Garros = French Open - men
+library(dplyr)
+  # FNL : First Serve Percentage of total serves attempted
+  # FSW : First Serve Won percentage of points won on first serve
+  # SSP : Second Serve Percentage of total serves attempted
+  # SSW : Second Serve Won percentage of points won on second serve
+  # ACE : Ace Count
+  # DBF : Double Fault Count
+  # WNR : Winners Count
+  # UFE : Unforced Error Count
+  # BPC : Break Point Conversion percentage of break points won
+
+# 1. Importer les données
+  # getwd()
+path_French <- file.path("D:/R_test/Cours/Tennis-Major-Tournaments-Match-Statistics", "FrenchOpen-men-2013.csv")
+data_tennis <- read.csv(path_French)
+tennis_French <- as_tibble(data_tennis) # dplyr : data frame -> tibble
+tennis_French
+# 2. Afficher le nom des adversaires de Roger Federer.
+Opponents_Roger <- tennis_French %>%
+  filter(Player1 == "Roger Federer" | Player2 == "Roger Federer") %>%
+  select(Player1) # , Player2)
+Opponents_Roger
+
+# 3. Afficher le nom des demi-finalistes (ceux qui ont atteint le 6ème tour).
+demi_finalistes <- tennis_French %>% 
+  filter(Round == 6) %>% 
+  select(Player1, Player2) 
+demi_finalistes
+
+# 4. Combien de points disputés en moyenne par match ? Il faudra penser à ajouter dans la table une variable correspondant au nombre de points de chaque match (verbe mutate).
+points_tennis <- tennis_French %>% 
+  mutate(Points = TPW.1 + TPW.2) # TPW signifie"Total de points gagnés"
+mean_points <- points_tennis %>%
+  summarize(mean_points = mean(Points))
+  # mean_points
+
+# 5. Combien y a t-il eu d’aces par match en moyenne ?
+ACE_match <- tennis_French %>% summarise(mean_ace_match = sum(ACE.1 + ACE.2) / n())
+
+# 6. Combien y a t-il eu d’aces par match en moyenne à chaque tour ?
+ACE_tour <- tennis_French %>% 
+  group_by(Round) %>%
+  summarise(mean_ace_match = sum(ACE.1 + ACE.2) / n())
+
+# 7. Combien y a t-il eu de doubles fautes au total dans le tournoi (attention aux données manquantes, taper help(sum) pour voir comment les gérer) ?
+sum_DBF_tour <- tennis_French %>% summarise(sum_DBF = sum(DBF.1 + DBF.2, na.rm = T))
+  # sum_DBF_tour
+
+# 8. Importer les données pour le tournoi masculin de Wimbledon 2013.
+path_Wimbledon <- file.path("D:/R_test/Cours/Tennis-Major-Tournaments-Match-Statistics", "Wimbledon-men-2013.csv")
+data_tennis_Wimbledon <- read.csv(path_Wimbledon)
+tennis_Wimbledon <- as_tibble(data_tennis_Wimbledon) # dplyr : data frame -> tibble
+tennis_Wimbledon
+
+# 9. Concaténer les tables en ajoutant une variable permettant d’identifier le tournoi. On pourra utiliser bind_rows abev l’option .id
+matchs_Roland_Garros <- tennis_French %>% mutate(tournoi = "Roland Garros")
+matchs_Wimbledon_Open <- tennis_Wimbledon %>% mutate(tournoi = "Wimbledon")
+matchs<- bind_rows(matchs_Roland_Garros, matchs_Wimbledon_Open, .id = "id_tournoi")
+matchs
+
+# 10. Afficher les matchs de Federer pour chaque tournoi.
+tournoi_Federer <- matchs %>%
+  group_by(tournoi) %>%
+  filter(Player1 == "Roger Federer" | Player2 == "Roger Federer") %>%
+  select(Player1, Player2)
+tournoi_Federer
+
+# 11. Comparer les nombres d’aces par matchs à chaque tour pour les tournois de Roland Garros et Wimbledon
+ACE_tour_RG <- tennis_French %>% 
+  group_by(Round) %>%
+  summarise(mean_ace_RG = sum(ACE.1 + ACE.2) / n())
+ACE_tour_Wim <- tennis_Wimbledon %>% 
+  group_by(Round) %>%
+  summarise(mean_ace_Wim = sum(ACE.1 + ACE.2) / n())
+ACE_tour_RG
+ACE_tour_Wim
+```
+
+# Chapitre 4 Visualisation avec ggplot2
+
+```{r}
+# demo(graphics)
+x <- seq(-2*pi,2*pi,by=0.05)
+y <- sin(x)
+plot(x,y) #points (par défaut)
+plot(x, y, type="l") #représentation sous forme de ligne
+```
+
+```{r}
+# contexte
+# getwd()
+ozone <- read.table("ozone.txt")
+# summary(ozone)
+plot(ozone[,"T12"],ozone[,"maxO3"])
+plot(maxO3~T12,data=ozone)
+plot(ozone[,"T12"],ozone[,"maxO3"],xlab="T12",ylab="maxO3")
+
+# histogram, barplot et boxplot 
+hist(ozone$maxO3,main="Histogram")
+barplot(table(ozone$vent)/nrow(ozone),col="blue")
+boxplot(maxO3~vent,data=ozone)
+```
+
+```{r}
+# des graphes dynamiques
+# install.packages("rAmCharts")
+library(rAmCharts)
+amHist(ozone$maxO3)
+amPlot(ozone,col=c("T9","T12"))
+amBoxplot(maxO3~vent,data=ozone)
+```
+
+## 
+
+**Exercice 4.1 (Premier graphe)**
+
+```{r}
+# Tracer la fonction sinus entre 0 et 2π
+# Ajouter le titre Représentation de la fonction sinus
+x <- seq(-2*pi,2*pi,by=0.05)
+y <- sin(x)
+plot(x, y, type = "l", xlab = "x", ylab = "sin(x)", main = "Représentation de la fonction sinus") 
+```
+
+## **Exercice 4.2 (Tracé de densités)**
+
+```{r}
+# 1. Tracer la densité de la loi normale centrée réduite entre −4 et 4 (utiliser dnorm).
+x <- seq(-4, 4, length.out = 100)
+y <- dnorm(x)
+plot(x, y, type = "l", xlab = "x", ylab = "Densité de probabilité")
+# 2. Ajouter une ligne verticale (en tirets) qui passe par  x=0
+abline(v = 0, lty = 2)
+# 3. Sur le même graphe, ajouter les densités de loi la de Student à 5 et 30 degrés de liberté (utiliser dt). On utilisera la fonction lines et des couleurs différentes pour chaque densité.
+y1 <- dt(x, df = 5) 
+y2 <- dt(x, df = 30)  # Student's t-distribution
+lines(x, y1, col = "red")
+lines(x, y2, col = "blue")
+# 4. Ajouter une légende qui permet de repérer chaque densité (fonction legend)
+legend("topright", 
+       legend = c("Loi normale", "Loi de Student à 5 degrés de liberté", "Loi de Student à 30 degrés de liberté"), 
+       col = c("black", "red", "blue"), 
+       lty = c(1, 1, 1))
+
+```
+
+## 
+
+**Exercice 4.3 (Tâches solaires)**
+
+```{r}
+# 1. Importer la série taches_solaires.csv qui donne, date par date, un nombre de taches solaires observées.
+solaires <- read.csv("taches_solaires.csv", sep = ";", dec = ".", row.names = 1)
+library(tidyverse)
+
+# 2. A l’aide de la fonction cut_interval du tidyverse créer un facteur qui sépare l’intervalle d’années d’observation en 8 intervalles de tailles à peu près égales. On appellera periode ce facteur.
+solaires <- solaires %>% 
+  mutate(periode = cut_interval(solaires$column_3, n=8)) # %>% count(Interval)
+  
+# 3. Utiliser les levels suivants pour le facteur periode.
+couleurs <- c("yellow", "magenta", "orange", "cyan","grey", "red", "green", "blue")
+levels(solaires$periode) <- couleurs
+  # solaires
+
+# 4. Visualiser la série du nombre de taches en utilisant une couleur différente pour chaque période.
+library(dplyr)
+#summary_periode <- solaires %>%
+  #group_by(periode) %>%
+  #summarise(count = n())
+#count
+solaires_y_n <- solaires %>% subset(periode == "yellow") %>% count()
+nb_coleurs <- solaires %>% group_by(periode) %>% summarise( n())
+plot(nb_coleurs)
+
+
+```
+
+**Exercice 4.4 (Layout)**
+
+```{r}
+# contexte
+ozone <- read.table("ozone.txt")
+ozone
+# A l’aide de la fonction layout séparer la fenêtre graphique en deux lignes avec
+  # un graphe sur la première ligne (nuage de points maxO3 vs T12)
+  # 2 graphes sur la deuxième ligne (histogramme de T12 et boxplot de maxO3).
+layout(matrix(c(1, 1, 2, 3), 2, 2, byrow = T))
+# same number means occupy, different numbers means the orders
+plot(ozone$T12, ozone$maxO3, xlab="T12", ylab="maxO3")
+hist(ozone$T12, xlab="T12", ylab="Fréquence")
+boxplot(ozone$maxO3, xlab="maxO3")
+
+```
+
+## La grammaire **ggplot2**
+
+```{r}
+library(tidyverse)
+set.seed(2345)
+# chose 5000 rows lternatively from 1 to amount of diamonds 
+diamonds2 <- diamonds[sample(nrow(diamonds),5000),]  
+summary(diamonds2)
+diamonds2
+
+plot(price~carat,data=diamonds2)
+
+ggplot(diamonds2) + aes(x=carat,y=price) + geom_point()
+
+# Data et aesthetics
+ggplot(diamonds2)+aes(x=carat,y=price,color=cut)+geom_point()
+```
+
+## 
+
+**Exercice 4.5 (Premiers graphes ggplot)**
+
+```{r}
+# 1. Tracer l’histogramme de la variable carat (utiliser geom_histogram).
+ggplot(diamonds2) + aes(carat) + geom_histogram()
+
+# 2.Tracer l’histogramme de la variable carat avec 10 classes(help(geom_histogra)).
+ggplot(diamonds2) + aes(carat) + geom_histogram(bins = 10)
+
+# 3. Tracer le diagramme en barres de la variable cut (utiliser geom_bar).
+ggplot(diamonds2) + aes(cut) + geom_bar()
+```
+
+## 
+
+**Exercice 4.6 (Diagrammes en barres)**
+
+```{r}
+# 1. Tracer le diagramme en barres de la variable cut avec des barres bleues.
+ggplot(diamonds2)+aes(cut)+geom_bar(color = "blue", fill = "blue")
+
+# 2. Tracer le diagramme en barres de la variable cut avec une couleur pour chaque modalité de cut ainsi qu’une légende qui permet de repérer la couleur.
+couleurs <- c("yellow", "magenta", "orange", "cyan", "red", "green", "blue")
+ggplot(diamonds, aes(cut, fill = cut)) +
+  geom_bar(color = "black") +
+  scale_fill_manual(values = couleurs) +
+  labs(title = "Diagramme en barres de la variable cut",
+       x = "cut", y = "Fréquence") +
+  theme(legend.position = "top")
+
+# 3. Tracer le diagramme en barres de la variable cut avec une couleur pour chaque modalité que vous choisirez (et sans légende).
+ggplot(diamonds, aes(cut, fill = cut)) +
+  geom_bar(color = "black", alpha = 0.8) +
+  scale_fill_manual(values = couleurs, guide = F) 
+```
+
+### Statistics
+
+```{r}
+D <- data.frame(X=seq(-2*pi,2*pi,by=0.01))
+ggplot(D)+aes(x=X,y=sin(X))+geom_line()
+
+ggplot(diamonds2)+aes(x=price)+geom_histogram(bins=40)
+ggplot(diamonds2)+aes(x=price,y=..density..)+geom_histogram(bins=40)
+
+ggplot(diamonds2)+aes(x=price,y=..density..)+stat_density()
+
+```
+
+## 
+
+**Exercice 4.7 (Diagramme en barres "très simple"...)**
+
+```{r}
+# On considère une variable qualitative  X dont la loi est donnée par
+# Représenter cette distribution de probabilité avec un diagramme en barres.
+colors <- c("red", "blue", "green", "black")
+prob <- c(0.3, 0.2, 0.4, 0.1)
+barplot(prob, col = colors)
+
+```
+
+## 
+
+**Exercice 4.8 (Lissage)**
+
+```{r}
+# 1. Représenter le lissage non linéaire de la variable price contre la variable carat à l’aide de geom_smooth puis de stat_smooth.
+ggplot(diamonds2)+aes(x=carat,y=price)+geom_smooth()
+ggplot(diamonds2)+aes(x=carat,y=price)+stat_smooth()
+
+# 2. Même question mais avec une ligne en pointillés à la place d’un trait plein
+ggplot(diamonds2)+aes(x=carat,y=price)+geom_smooth(linetype = "dashed")
+ggplot(diamonds2)+aes(x=carat,y=price)+stat_smooth(linetype = "dashed")
+```
+
+### Scales
+
+```{r}
+ggplot(diamonds2)+aes(x=carat,y=price,color=cut)+geom_point()+
+  scale_color_manual(values=c("Fair"="black","Good"="yellow","Very Good"="blue","Premium"="red","Ideal"="green"))
+
+p1 <- ggplot(diamonds2)+aes(x=cut)+geom_bar(aes(fill=cut))
+p1
+p1+scale_fill_brewer(palette="Purples")
+
+p2 <- ggplot(diamonds2)+aes(x=carat,y=price)+geom_point(aes(color=depth))
+p2
+p2+scale_color_gradient(low="red",high="yellow")
+
+p2+scale_x_continuous(breaks=seq(0.5,3,by=0.5))+
+  scale_y_continuous(name="prix")+
+  scale_color_gradient("Profondeur")
+```
+
+### Group et facets
+
+```{r}
+# price vs carat pour chaque modalité de cut
+ggplot(diamonds2)+aes(x=carat,y=price,group=cut)+
+  geom_smooth(method="loess")
+# sur plusieurs fenêtres
+ggplot(diamonds2)+aes(x=carat,y=price)+
+  geom_smooth(method="loess")+facet_wrap(~cut)
+
+ggplot(diamonds2)+aes(x=carat,y=price)+
+  geom_smooth(method="loess")+facet_wrap(~cut,nrow=1)
+
+# facet_grid divisent la fenêtre d’une façon différente
+# color ~ cut , diviser en fonction de 2 variables
+ggplot(diamonds2)+aes(x=carat,y=price)+geom_point()+
+  geom_smooth(method="lm")+facet_grid(color~cut)
+ggplot(diamonds2)+aes(x=carat,y=price)+geom_point()+
+  geom_smooth(method="lm")+facet_wrap(color~cut)
+```
+
+## Compléments
+
+```{r}
+# two graphes on the same layer 
+X <- seq(-2*pi,2*pi,by=0.001)
+Y1 <- cos(X)
+Y2 <- sin(X)
+donnees1 <- data.frame(X,Y1)
+donnees2 <- data.frame(X,Y2)
+ggplot(donnees1)+geom_line(aes(x=X,y=Y1))+
+  geom_line(data=donnees2,aes(x=X,y=Y2),color="red")
+```
+
+```{r}
+# ggplot
+p <- ggplot(diamonds2)+aes(x=carat,y=price,color=cut)+geom_point()
+p+theme_bw()
+p+theme_classic()
+p+theme_grey()
+```
+
+## 
+
+**Exercice 4.9 (Fonctions cosinus et sinus)**
+
+```{r}
+# 1. Tracer les fonctions sinus et cosinus. On utilisera tout d’abord deux jeux de données : un pour le sinus, l’autre pour le cosinus.
+x <- seq(-2*pi, 2*pi, by = 0.01)
+sinus <- data.frame(x = x, y1 = sin(x))
+cosinus <- data.frame(x = x, y2 = cos(x))
+p1 <- ggplot(sinus) + aes(x = x, y = y1) + geom_line()
+p2 <- ggplot(cosinus) + aes(x = x, y = y2) + geom_line()
+
+# 2. Faire la même chose avec un jeu de données et deux appels à la fonction geom_line. On pourra ajouter une légende
+ggplot() +
+  # Courbe sinus
+  geom_line(data = sinus, aes(x = x, y = y1, color = "sinus")) +
+  # Courbe cosinus
+  geom_line(data = cosinus, aes(x = x, y = y2, color = "cosinus")) +
+  # Légende
+  labs(x = "x", y = "y", color = "") +
+  scale_color_manual(values = c("sinus" = "blue", "cosinus" = "red")) 
+
+# 3. Faire la même chose avec un jeu de données et un seul appel à geom_line. On pourra utiliser la fonction pivot_longer du tidyverse.
+  # la fonction pivot_longer() pour regrouper les données des deux fonctions en une seule colonne
+library(tidyverse)
+
+data <- data.frame(x = x, y1 = sin(x), y2 = cos(x)) %>%
+  pivot_longer(cols = c("y1", "y2"), names_to = "y1_y2", values_to = "y")
+
+ggplot(data, aes(x = x, y = y, color = y1_y2)) +
+  geom_line() +
+  scale_color_manual(values = c("y1" = "blue", "y2" = "red")) +
+  theme_minimal()
+
+# 4. Tracer les deux fonctions sur deux fenêtres graphiques (utiliser facet_wrap).
+ggplot(data)+aes(x=x,y=y, color = y1_y2)+
+  geom_line()+facet_wrap(~y1_y2)+scale_color_manual(values = c("y1" = "blue", "y2"= "red"))
+
+# 5. Faire la même chose avec la fonction grid.arrange du package gridExtra.
+ # install.packages("gridExtra")
+library(gridExtra)
+grid.arrange(p1, p2)
+```
+
+## 
+
+**Exercice 4.10 (Différents graphes)**
+
+```{r}
+data(mtcars)
+summary(mtcars)
+# Tracer l’histogramme de mpg (on fera varier le nombre de classes).
+hist(mtcars$mpg)
+num_classes <- 10
+hist(mtcars$mpg, breaks = num_classes)
+
+# Tracer l’histogramme de la densité.
+ggplot(mtcars,aes(x=mpg))+geom_density(colour="red")
+
+# Tracer le diagramme en barres de cyl
+ggplot(mtcars,aes(cyl))+geom_bar()
+
+# Tracer le nuage de points disp vs mpg en utilisant une couleur différente pour chaque valeur de cyl.
+ggplot(mtcars)+aes(x=disp,y=mpg,color=cyl)+geom_point()
+
+# 5. Ajouter le lisseur linéaire sur le graphe (un lisseur par modalité de cyl).
+ggplot(mtcars, aes(x = disp, y = mpg, color = factor(cyl))) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+## 
+
+**Exercice 4.11 (Résidus pour régression simple)**
+
+```{r}
+# 1. Générer un échantillon selon le modèle linéaire
+i <- 100
+set.seed(12345)
+
+x <- runif(i, min = 0, max = 1)
+epsilon <- rnorm(i, mean = 0, sd = 0.2)
+
+y <- 3 + x + epsilon
+
+Echantillon <- data.frame(x = x, y = y)
+Echantillon
+
+# 2. Tracer le nuage de points Y vs X et ajouter le lisseur linéaire.
+ggplot(Echantillon, aes(x = x, y = y)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+#  3. Représenter les résidus 
+x_start = min(x)
+y_start = 3 + x_start + epsilon
+x_end = max(x)
+y_end = 3 + x_end + epsilon
+ggplot(Echantillon, aes(x = x, y = y)) +
+  geom_point() +
+  geom_smooth(method = "lm")+
+  geom_segment(aes(x = x_start,y = y_start,xend = x_end, yend = y_end),colour="red")
+```
+
+## 
+
+**Exercice 4.12 (Challenge)**
+
+```{r}
+# contxte On considère les données diamonds.
+# 1. Tracer les graphes suivants (utiliser coord_flip pour le second).
+head(diamonds)
+p <- ggplot(diamonds) + aes(x = cut, y = carat) + geom_boxplot(aes(fill=cut))
+p + theme_minimal()
+
+p + coord_flip() + theme_minimal()
+
+# ggplot(diamonds)+aes(x=carat)+ stat_density() + facet_grid(~cut, nrow=)
+p_density <- ggplot(diamonds,aes(x=carat))+geom_density() + facet_grid(cut~.) + theme_minimal()
+
+# Ajouter sur le troisième graphe les quartiles de la variable carat pour chaque valeur de cut. On utilisera une ligne verticale.
+Q <- quantile(diamonds$carat)
+Q  <- as.numeric(Q[2:4])
+p_finallllll <- p_density + geom_vline(xintercept = Q)
+p_finallllll
+# install.packages("ggstance")
+library(ggstance)
+#ggplot(diamonds)+geom_density(aes(x=carat))+geom_vline(xintercept = Q) + geom_boxploth(aes(y = cut, x = carat, fill = cut)) + facet_grid(cut~)
+p_finallllll + geom_boxplot(aes(fill=cut))
+```
