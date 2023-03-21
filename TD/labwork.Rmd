@@ -1,0 +1,54 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Labwork on Statistical learning
+
+## 
+
+Part I
+Unsupervised learning
+
+### Ex3
+
+```{r}
+# (a)
+gobelins <- read.csv("gobelins.csv", sep = ",", dec = ".", header = TRUE)
+head(gobelins)
+
+# (b)
+
+
+gobelins <- gobelins[, -which(names(gobelins) == "id")]
+head(gobelins)
+#(c)
+#install.packages("rpart")
+```
+
+```{r}
+library(rpart)
+
+tree <- rpart(type ~ ., gobelins)
+
+library(rpart.plot)
+prp(tree, extra = 1)
+```
+
+```{r}
+rpart.plot(tree)
+
+```
+
+```{r}
+# (f)
+library(ggplot2)
+df_imp <- data.frame(feat = names(tree$variable.importance),
+                     importance = tree$variable.importance/sum(tree$variable.importance))
+
+ggplot(df_imp, aes(x=feat, y=importance)) + 
+  geom_bar(stat='identity', fill="cadetblue3") + 
+    theme_bw()
+
+
+```
